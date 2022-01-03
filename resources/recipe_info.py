@@ -6,25 +6,27 @@ from http import HTTPStatus
 from mysql_connection import get_connection
 from mysql.connector.errors import Error
 
-# 클래스 작성 : 변수와 함수로 구성된 묶음 
-# 클래스는 상속이 가능하다!
-# 아래 클래스는, flask_restful 라이브러리의
-# Resource 클래스를 상속한 것이다.
-class RecipeListResource(Resource) :
-    def get(self):
-        # 클라이언트가 GET 요청하면, 이 함수에서
-        # 우리가 코드를 작성해 주면 된다.
+class RecipeResource(Resource) :
+
+    def get(self, recipe_id) :
+        # 클라이언트에서, 경로에 들어있는 데이터를 받고 싶을때는
+        # app.py에서 연결한 변수로 처리할 수 있다.
+        # 이 변수는 get 함수의 파라미터로 받는다.
+
+        print(recipe_id)
 
         # 1. db 접속recipe 테이블에서 select 
         try :
             connection = get_connection()
 
             query = ''' select * 
-                        from recipe ; '''
+                        from recipe where id = %s ; '''
+            
+            param = (recipe_id, )
             
             cursor = connection.cursor(dictionary = True)
 
-            cursor.execute(query)
+            cursor.execute(query, param)
 
             # select 문은 아래 내용이 필요하다.
             record_list = cursor.fetchall()
@@ -53,50 +55,38 @@ class RecipeListResource(Resource) :
                 print('connection does not exist')
 
 
-        return {'data' :record_list} , HTTPStatus.OK
-
-    def post(self) :
-
-        # 클라이언트의body로 보낸 json데이터는
-        # request.get_json() 함수로 받는다.
+        return {'data' : record_list}, HTTPStatus.OK
+    
+    def put(self, recipe_id) :
+        
         data = request.get_json()
-        #   data = { 'name' : '된장찌게', 'description' : '두부 된장찌게 끓이는법',
-        # 'num_of_servings' : 6, 'cook_time' : 35, 
-        # 'directions':'두부 넣고 물넣고 된장넣고 끓인다.', 'user_id' : 1}
-
-        print(data)
 
         try :
-            # 1. DB 에 연결
-            connection = get_connection()
-           
-            # 2. 쿼리문 만들고
-            query = '''insert into recipe
-                    (name, description, num_of_servings, cook_time, directions,
-                    user_id)
-                    values
-                    (%s, %s, %s, %s, %s, %s);'''
-            # 파이썬에서, 튜플만들때, 데이터가 1개인 경우에는 콤마를 꼭
-            # 써준다.
-            record = (data['name'], data['description'], data['num_of_servings'],
-                        data['cook_time'], data['directions'], data['user_id']  )
             
+            connection = get_connection()
+
+            # 2. 쿼리문 만들고
+            query = '''update recipe
+                        set cook_time = %s, directions = %s
+                        where id = %s;'''
+            # 파이썬에서 튜플만들때, 데이터가 한개인 경우에는 콤마를 꼭 써준다.
+            record = (data['cook_time'], data['directions'], recipe_id)
+
             # 3. 커넥션으로부터 커서를 가져온다.
             cursor = connection.cursor()
-
+                
             # 4. 쿼리문을 커서에 넣어서 실행한다.
             cursor.execute(query, record)
 
-            # 5. 커넥션을 커밋한다.=> 디비에 영구적으로 반영하라는 뜻.
+            # 5. 커넥션을 커밋한다. => 디비에 영구적으로 반영하라는 뜻.
             connection.commit()
 
-        except Error as e:
-            print('Error ', e)
+        except Error as e :
+            print('Error', e)
             return {'error' : str(e)} , HTTPStatus.BAD_REQUEST
         finally :
-            if connection.is_connected():
+            if connection.is_connected() :
                 cursor.close()
                 connection.close()
                 print('MySQL connection is closed')
-
-        return {'result' : '잘 저장되었습니다.'} , HTTPStatus.OK
+        return {'result' : '업데이트가 잘 되었습니다.'}, HTTPStatus.OK
