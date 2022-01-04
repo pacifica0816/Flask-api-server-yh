@@ -1,2 +1,5 @@
 mysql-connector-python
 flask-restful
+psycopg2-binary
+passlib
+email-validator
