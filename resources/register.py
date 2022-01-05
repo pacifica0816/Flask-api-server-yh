@@ -33,7 +33,7 @@ class UserRegisterResource(Resource) :
             return {'error' : '이메일 주소가 잘못되었습니다.'} ,HTTPStatus.BAD_REQUEST
 
         # 3. 비밀번호 길이같은 조건이 있는지 확인하는 코드
-        #    잘못됬으면, 클라이언트에 응답한다.
+        #    잘못됐으면, 클라이언트에 응답한다.
         if len( data['password'] ) < 4 or len(data['password']) > 10 :
             return {'error' : '비번 길이 확인하세요'}, HTTPStatus.BAD_REQUEST
 

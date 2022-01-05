@@ -16,7 +16,7 @@ from utils import hash_password, check_password
 
 # 로그아웃된 토큰은, 여기에 저장해준다.
 # 그러면, jwt가 알아서 토큰이 이 셋에 있는지 확인해스,
-# 로그아웃 한ㄷ 유저인지 판단한다.
+# 로그아웃 한 유저인지 판단한다.
 
 jwt_balcklist = set()
 

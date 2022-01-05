@@ -99,7 +99,7 @@ class RecipeResource(Resource) :
 
             # 2. 쿼리문 만들고
             query = '''update test
-                        where id = %s;;'''
+                        where id = %s;'''
             # 파이썬에서 튜플만들때, 데이터가 한개인 경우에는 콤마를 꼭 써준다.
             record = (id, )
 

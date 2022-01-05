@@ -1,2 +1,2 @@
 class Config :
-    SECRET_KET = 'super-secret-key'
+    JWT_SECRET_KEY = 'yh@1234'
