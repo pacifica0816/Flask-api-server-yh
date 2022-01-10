@@ -5,6 +5,8 @@ from config import Config
 from http import HTTPStatus
 
 from flask_restful import Api
+
+
 from resources.login import UserLoginResource
 from resources.logout import LogoutResource, jwt_blacklist
 

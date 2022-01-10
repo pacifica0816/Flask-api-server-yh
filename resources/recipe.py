@@ -6,6 +6,8 @@ from http import HTTPStatus
 from mysql_connection import get_connection
 from mysql.connector.errors import Error
 
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 # 클래스 작성 : 변수와 함수로 구성된 묶음 
 # 클래스는 상속이 가능하다!
 # 아래 클래스는, flask_restful 라이브러리의
@@ -55,6 +57,11 @@ class RecipeListResource(Resource) :
 
         return {'data' :record_list} , HTTPStatus.OK
 
+
+    # 이 함수의 optional 파라미터가 False면,
+    # 무조건 토큰을 헤더에 적은 상태에서 API호출해야 이 함수가 실행된다.
+    @jwt_required() 
+
     def post(self) :
 
         # 클라이언트의body로 보낸 json데이터는
@@ -65,6 +72,9 @@ class RecipeListResource(Resource) :
         # 'directions':'두부 넣고 물넣고 된장넣고 끓인다.', 'user_id' : 1}
 
         print(data)
+
+        # 유저아이디빼오고 호출한 유저아이디를 토큰에서빼서 데이터베이스에 넣어준다
+        user_id = get_jwt_identity()
 
         try :
             # 1. DB 에 연결
@@ -79,7 +89,7 @@ class RecipeListResource(Resource) :
             # 파이썬에서, 튜플만들때, 데이터가 1개인 경우에는 콤마를 꼭
             # 써준다.
             record = (data['name'], data['description'], data['num_of_servings'],
-                        data['cook_time'], data['directions'], data['user_id']  )
+                        data['cook_time'], data['directions'], user_id  )
             
             # 3. 커넥션으로부터 커서를 가져온다.
             cursor = connection.cursor()
