@@ -1,4 +1,6 @@
 mysql-connector-python
+numpy
+pandas
 flask-restful
 psycopg2-binary
 passlib
